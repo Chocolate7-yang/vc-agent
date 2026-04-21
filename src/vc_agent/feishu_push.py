@@ -2,12 +2,7 @@
 """
 飞书应用模式推送：在每日简报生成成功后推送 interactive 卡片（折叠分栏 + Markdown；
 每条含原文链接时在折叠内附 👍/👎 回调按钮，点击写入 preferences）。
-环境变量：
-  FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_RECEIVE_ID  应用发消息必需项
-  FEISHU_RECEIVE_ID_TYPE  可选，默认 chat_id
-  FEISHU_PUSH_ON_BOOTSTRAP 默认 0：run.sh 7x24 启动时同步跑的简报不推送（避免非 07:00 误发）；设为 1 则启动简报也推送
 推送失败仅打日志，不影响简报落盘与后续调度。
-正文与条目不做长度压缩；若超出飞书接口限制，由 API 报错，请改本地 Markdown 或拆分推送。
 """
 
 from __future__ import annotations

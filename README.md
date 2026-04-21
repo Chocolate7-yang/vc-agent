@@ -2,6 +2,8 @@
 
 一个面向投资研究场景的自动化信息流系统：持续采集 AI / 芯片 / 机器人赛道内容，自动过滤并生成每日简报，支持飞书推送与反馈学习。
 
+简报示例：https://applink.feishu.cn/client/message/link/open?token=AmnhOZk%2BAAvHaefKuSHADNw%3D
+
 ### 网络准备（VPN）
 
 当前主数据源是 YouTube RSS，运行时需要访问 `youtube.com`。
@@ -48,9 +50,9 @@ cp .env.example .env
 
 4. 启动本地长连接并完成验证
 
-   - **推荐**：`bash run.sh start` 或 `bash run.sh 7x24` 会在加载根目录 `.env` 后**自动后台**启动 `feishu_events`（无需再手敲 `source .env`）；日志见 `logs/feishu_events.log`，终端会显示 `✅ 已启动` 或报错与日志末尾。
-   - **仅调试长连接（前台）**：`bash run.sh feishu-ws`
-   - 或手动：`set -a && source .env && set +a && PYTHONPATH=src .venv/bin/python -m vc_agent.feishu_events`
+```bash
+set -a && source .env && set +a && PYTHONPATH=src .venv/bin/python -m vc_agent.feishu_events
+```
 
    - 终端出现 `connected to wss://...` 后，在开发者后台完成：
    - 事件配置 -> 订阅方式“长连接” -> 验证成功 -> 保存
@@ -87,7 +89,7 @@ a. 测试飞书立即推送（立刻执行一轮“收料 -> 简报 -> 飞书”
 bash run.sh start
 ```
 
-b. 每日推送（7x24）
+b. 每日定时推送（7x24）
 ```bash
 bash run.sh 7x24 
 ```
@@ -108,9 +110,9 @@ bash run.sh test724 19:05
 - 数据采集：YouTube 频道 RSS（白名单）
 - 内容处理：去噪、去重、规则评分、分栏归类
 - 摘要与简报：调用 LLM 生成可读性摘要与投资信号
-- 输出与持久化：简报 Markdown 在 `output/`，采集与运行状态在 `data/vc_agent.db`
-- 反馈学习：飞书卡片或 `python -m vc_agent.feedback` 的每条 👍/👎 会先**追加**到 `data/feedback.jsonl`（事件日志），再**全量重算**并写入 `data/preferences.json`（聚合乘子）；排序阶段只读 `preferences.json`。两份文件的职责与备份注意见 `design.md`「反馈与偏好：落盘与读取」
-- 调度运行：单次执行 + 7x24 常驻调度
+- 输出与持久化：`output/` Markdown + `data/vc_agent.db`
+- 反馈学习：👍/👎 回写 `preferences.json` 影响后续排序
+- 调度运行：单次执行 / 7x24 常驻调度
 
 ## 数据源状态
 
@@ -122,12 +124,40 @@ bash run.sh test724 19:05
 
 - `design.md`：系统设计文档
 - `run.sh`：统一启动脚本
-- `src/vc_agent/agent.py`：主流程与规则
-- `src/vc_agent/pipeline_service.py`：采集与简报服务入口
-- `src/vc_agent/scheduler.py`：调度器入口
-- `src/vc_agent/storage.py`：SQLite 持久化
-- `src/vc_agent/preferences.py`：偏好学习
-- `src/vc_agent/feedback.py`：反馈命令
+
+### `src/vc_agent/`
+
+- `__init__.py`：包导出
+- `agent.py`：主流程、规则评分与晨报生成
+- `briefing.py`：Markdown / JSON 简报输出封装
+- `config.py`：项目根、`DATA_DIR` / `OUTPUT_DIR` 等路径
+- `feishu_app_send.py`：飞书应用机器人 REST 发消息
+- `feishu_events.py`：飞书长连接与卡片事件回调
+- `feishu_list_chats.py`：列出会话并打印 `chat_id`（配置辅助）
+- `feishu_push.py`：飞书 interactive 卡片与晨报推送
+- `feishu_ws_ensure.py`：确保长连接进程在 shell 退出后仍常驻
+- `feedback.py`：飞书卡片反馈命令解析
+- `ingest.py`：YouTube RSS 等采集
+- `pipeline_service.py`：单次「采集 → 简报 → 推送」服务入口
+- `preferences.py`：👍/👎 偏好聚合与读写
+- `ranking.py`：排序与规则打分
+- `scheduler.py`：APScheduler 定时与 7×24 入口
+- `scoring_profile.json`：评分阈值与关键词配置
+- `storage.py`：SQLite 去重与持久化
+- `summarization.py`：LLM 多栏摘要
+
+### `tests/`
+
+- `test_feishu_events.py`：飞书事件与长连接相关单测
+- `test_feishu_push.py`：飞书推送相关单测
+- `test_preferences.py`：偏好读写与聚合单测
+- `test_ranking_and_scoring.py`：排序与评分单测
+- `test_storage.py`：存储层单测
+
+### `data/`
+
+- `youtube_channels.json`：YouTube RSS 频道白名单（随仓库提交）
+- 同目录下 `vc_agent.db`、`preferences.json` 等为运行时生成，默认不入库
 
 ---
 

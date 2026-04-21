@@ -1,0 +1,227 @@
+{
+  "brief_id": "brief_20260422_024617",
+  "date": "2026-04-22",
+  "insights": [
+    "AI法律工具推动服务效率提升，潜在市场增长空间大，值得关注。",
+    "EUV光刻技术突破提升芯片制造效率，ASML技术展示增强市场信心。",
+    "人形机器人技术升级强化应用能力，或提升产品竞争力。"
+  ],
+  "stats": {
+    "monitored_total": 90,
+    "passed_count": 15,
+    "platform_dist_brief": {
+      "YouTube": 15
+    },
+    "pref_hint": "已积累 35 条用户反馈，用于优化内容排序。",
+    "coverage_ratio": 1.0,
+    "novelty_ratio_7d": 1.0,
+    "feedback_coverage_ratio": 0.1333,
+    "exploration_ratio": 0.1
+  },
+  "sections": [
+    {
+      "topic": "AI",
+      "heading": "🤖 AI 领域",
+      "shown": 5,
+      "total": 5,
+      "items": [
+        {
+          "url": "https://www.youtube.com/watch?v=Y-jsJUngyFU",
+          "urls": [
+            "https://www.youtube.com/watch?v=Y-jsJUngyFU"
+          ],
+          "title": "AI法律服务新尝试",
+          "content": "Harvey开发AI法律工具，推动流程自动化与效率提升 AI在法律行业的应用，可能影响专业服务模式和效率 AI律师处理复杂流程，平衡人工与自动化 聚焦大型律所，影响计费模式。",
+          "signal": "利好：AI提升法律服务效率，潜在市场增长空间大",
+          "source": "YouTube",
+          "author": "Greylock",
+          "topic": "AI"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=a-YJ6h7EJv8",
+          "urls": [
+            "https://www.youtube.com/watch?v=a-YJ6h7EJv8"
+          ],
+          "title": "AI助力生命科学决策",
+          "content": "OpenAI推出AI工具辅助生命科学研究决策 推动生命科学领域研究决策的AI工具，可能影响相关投融资方向 AI支持科研流程中的假设生成 提升生命科学领域研究效率。",
+          "signal": "利好: 提升科研效率，或吸引相关领域投资",
+          "source": "YouTube",
+          "author": "OpenAI",
+          "topic": "AI"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=1ZMDA6atOhc",
+          "urls": [
+            "https://www.youtube.com/watch?v=1ZMDA6atOhc"
+          ],
+          "title": "企业AI代理平台发展",
+          "content": "企业AI代理平台加速演进，推动效率与能力提升 聚焦企业级AI代理平台，反映AI应用深化趋势 企业上下文对AI代理关键作用 自主代理数量激增带来管理挑战。",
+          "signal": "利好：企业AI代理平台展现增长潜力",
+          "source": "YouTube",
+          "author": "Greylock",
+          "topic": "AI"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=HC47QcXrcfw",
+          "urls": [
+            "https://www.youtube.com/watch?v=HC47QcXrcfw"
+          ],
+          "title": "伊朗战争与AI关联性探讨",
+          "content": "AI领域关注地缘政治对技术发展的影响 偏通识，弱投融资信号 AI技术可能影响国际冲突中的决策机制 地缘政治风险或影响AI产业布局。",
+          "signal": "待观察: 未提及具体AI技术或投资动态",
+          "source": "YouTube",
+          "author": "WIRED",
+          "topic": "AI"
+        },
+        {
+          "url": "https://www.youtube.com/shorts/E-2AiD0UAlo",
+          "urls": [
+            "https://www.youtube.com/shorts/E-2AiD0UAlo"
+          ],
+          "title": "AI 或致互联网‘死亡’",
+          "content": "AI 可能改变互联网内容生产与广告逻辑 涉及 AI 对互联网生态和广告模式的潜在颠覆，与 AI 赛道相关 AI 替代人类访问网页影响广告模式 内容激励机制可能消失。",
+          "signal": "风险: AI 可能冲击现有互联网商业模式",
+          "source": "YouTube",
+          "author": "Sequoia Capital",
+          "topic": "AI"
+        }
+      ]
+    },
+    {
+      "topic": "芯片",
+      "heading": "⚡ 芯片",
+      "shown": 5,
+      "total": 5,
+      "items": [
+        {
+          "url": "https://www.youtube.com/watch?v=v9Pg92cdJa4",
+          "urls": [
+            "https://www.youtube.com/watch?v=v9Pg92cdJa4"
+          ],
+          "title": "High NA EUV光刻中晶圆台的作用",
+          "content": "ASML详解High NA EUV光刻中晶圆台的关键作用 涉及芯片制造核心工艺，影响先进制程发展 晶圆台实现超精密定位 磁悬浮与静电夹持技术应用。",
+          "signal": "利好: 技术突破提升芯片制造效率",
+          "source": "YouTube",
+          "author": "ASML",
+          "topic": "芯片"
+        },
+        {
+          "url": "https://www.youtube.com/shorts/85hyRm2bJMY",
+          "urls": [
+            "https://www.youtube.com/shorts/85hyRm2bJMY"
+          ],
+          "title": "EUV光刻机中掩模台的作用",
+          "content": "ASML展示EUV光刻机掩模台工作原理，凸显技术关键性 涉及芯片制造核心设备，影响产业技术进展 掩模台存储芯片蓝图 与晶圆台同步运作。",
+          "signal": "利好: 技术展示增强市场对ASML信心",
+          "source": "YouTube",
+          "author": "ASML",
+          "topic": "芯片"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=MfFGRl00LKY",
+          "urls": [
+            "https://www.youtube.com/watch?v=MfFGRl00LKY"
+          ],
+          "title": "ASML High NA EUV 光源技术解析",
+          "content": "ASML展示High NA EUV光源生成原理，凸显其在芯片制造中的关键地位 涉及芯片制造核心光刻技术，影响先进制程发展 EUV光源峰值波长13.5纳米 系统每秒产生5万次等离子体。",
+          "signal": "利好: 技术突破提升芯片制造效率",
+          "source": "YouTube",
+          "author": "ASML",
+          "topic": "芯片"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=_zGLKL9wkQg",
+          "urls": [
+            "https://www.youtube.com/watch?v=_zGLKL9wkQg"
+          ],
+          "title": "应用材料推AI芯片制造新技术",
+          "content": "应用材料推出AI芯片关键制造技术，或提升行业竞争力 涉及AI芯片核心元件改进，影响芯片性能与制造工艺 原子级晶体管优化提升算力 新金属接触技术降低电阻。",
+          "signal": "利好: 技术突破可能增强芯片制造企业竞争力",
+          "source": "YouTube",
+          "author": "Applied Materials",
+          "topic": "芯片"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=EfNUAnWwNnI",
+          "urls": [
+            "https://www.youtube.com/watch?v=EfNUAnWwNnI"
+          ],
+          "title": "Lam资本竞赛聚焦芯片AI应用",
+          "content": "Lam资本竞赛推动芯片AI创新，可能吸引VC关注 聚焦芯片领域AI技术落地，或影响投融资方向 竞赛聚焦半导体AI解决方案 已奖励百万美元给深度科技初创。",
+          "signal": "利好: 芯片AI赛道获资本支持",
+          "source": "YouTube",
+          "author": "Lam Research",
+          "topic": "芯片"
+        }
+      ]
+    },
+    {
+      "topic": "机器人",
+      "heading": "🦾 机器人",
+      "shown": 5,
+      "total": 5,
+      "items": [
+        {
+          "url": "https://www.youtube.com/watch?v=wL0-Pu_8F0U",
+          "urls": [
+            "https://www.youtube.com/watch?v=wL0-Pu_8F0U"
+          ],
+          "title": "Atlas 工业人形设计解析",
+          "content": "Boston Dynamics 发布 Atlas 工业版，强调实用而非拟人 展示人形机器人工业应用方向，影响未来布局 工业场景需求主导设计 模块化架构提升适应性。",
+          "signal": "中性偏弱逻辑：未提及融资或商业化进展",
+          "source": "YouTube",
+          "author": "Boston Dynamics",
+          "topic": "机器人"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=VeutCk1xYzI",
+          "urls": [
+            "https://www.youtube.com/watch?v=VeutCk1xYzI"
+          ],
+          "title": "人形机器人足部路径规划技术更新",
+          "content": "Agility升级Digit导航系统，强化实际应用能力 涉及人形机器人核心导航技术，可能影响产业布局与投资方向 Digit导航栈重构细节待进一步披露 足部路径规划技术提升实际部署效率。",
+          "signal": "利好：技术升级有助于增强产品竞争力",
+          "source": "YouTube",
+          "author": "Agility",
+          "topic": "机器人"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=sd8ivhpjI6g",
+          "urls": [
+            "https://www.youtube.com/watch?v=sd8ivhpjI6g"
+          ],
+          "title": "波士顿动力发布Atlas机器人",
+          "content": "波士顿动力推出Atlas机器人，或推动工业自动化投资增长 展示工业级人形机器人技术进展，可能影响未来制造业投资方向 Atlas产品版本正式发布 首次在客户现场部署。",
+          "signal": "利好：逻辑：展示商业化落地进展，增强投资者信心",
+          "source": "YouTube",
+          "author": "Boston Dynamics",
+          "topic": "机器人"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=kBwxmlI2yHQ",
+          "urls": [
+            "https://www.youtube.com/watch?v=kBwxmlI2yHQ"
+          ],
+          "title": "AI视觉升级，机器人更智能",
+          "content": "Boston Dynamics推出AI视觉升级，提升机器人智能水平 涉及机器人与AI结合，可能影响行业技术方向 Spot和Orbit的视觉能力增强 AIVI-Learning基于Google Gemini Robotics。",
+          "signal": "利好：技术升级可能提升产品竞争力",
+          "source": "YouTube",
+          "author": "Boston Dynamics",
+          "topic": "机器人"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=pN_bj5-QyW8",
+          "urls": [
+            "https://www.youtube.com/watch?v=pN_bj5-QyW8"
+          ],
+          "title": "Unitree开源人形机器人数据集",
+          "content": "Unitree开源数据集，或推动人形机器人技术进步 提供高质量真实场景数据，助力人形机器人技术发展 数据集覆盖场景广泛 持续高频更新。",
+          "signal": "利好：数据集有助于提升技术竞争力",
+          "source": "YouTube",
+          "author": "Unitree Robotics",
+          "topic": "机器人"
+        }
+      ]
+    }
+  ]
+}

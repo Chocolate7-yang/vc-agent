@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
 """
 飞书企业自建应用：长连接（WSS）接收 card.action.trigger，异步写入本地反馈库（preferences）。
-
-若客户端点击 👍/👎 提示「目标回调服务当前未在线」，请逐项确认：
-1) 本进程常驻：PYTHONPATH=src python -m vc_agent.feishu_events（run.sh 有 FEISHU_APP_ID/SECRET 时后台拉起；一键 start 在收料后、简报前拉起，避免收料过久 WSS 已断）
-2) 开放平台「事件与回调」里：**事件配置** 与 **回调配置** 的订阅方式均为 **长连接**（若误设为「请求 URL」则会离线）
-3) 回调配置中已添加 card.action.trigger，且长连接状态为已连接
-4) 发消息的 App ID / Secret 与本进程一致
-5) 若日志有「expected Dict … but was str at field: value」：飞书把 action.value 以字符串下发，本模块已在入 SDK 前强制解析为 dict；仍报错请升级 lark_oapi 或核对卡片 JSON
-
-环境：FEISHU_WS_RESTART_SEC  长连接断开后重连间隔秒数，默认 5
 """
 
 from __future__ import annotations

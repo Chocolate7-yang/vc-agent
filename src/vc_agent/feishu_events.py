@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 """
 飞书企业自建应用：长连接（WSS）接收 card.action.trigger，异步写入本地反馈库（preferences）。
+
+若客户端点击 👍/👎 提示「目标回调服务当前未在线」，请逐项确认：
+1) 本进程常驻：PYTHONPATH=src python -m vc_agent.feishu_events（run.sh 有 FEISHU_APP_ID/SECRET 时后台拉起；一键 start 在收料后、简报前拉起，避免收料过久 WSS 已断）
+2) 开放平台「事件与回调」里：**事件配置** 与 **回调配置** 的订阅方式均为 **长连接**（若误设为「请求 URL」则会离线）
+3) 回调配置中已添加 card.action.trigger，且长连接状态为已连接
+4) 发消息的 App ID / Secret 与本进程一致
+5) 若日志有「expected Dict … but was str at field: value」：飞书把 action.value 以字符串下发，本模块已在入 SDK 前强制解析为 dict；仍报错请升级 lark_oapi 或核对卡片 JSON
+
+环境：FEISHU_WS_RESTART_SEC  长连接断开后重连间隔秒数，默认 5
 """
 
 from __future__ import annotations
@@ -102,6 +111,45 @@ LOG = logging.getLogger("vc_agent.feishu_ws")
 _executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="feishu_fb")
 
 
+def _normalize_ws_payload_for_card_action(pl: bytes) -> bytes:
+    """
+    飞书经 WSS 下发的 card.action.trigger 里，action.value 常为 JSON 字符串；
+    lark_oapi 的 CallBackAction 将 value 声明为 Dict，JSON.unmarshal 会直接失败并返回 500，
+    客户端侧常表现为「目标回调服务当前未在线」。
+    """
+    try:
+        text = pl.decode(UTF_8)
+        root = json.loads(text)
+    except (UnicodeDecodeError, json.JSONDecodeError, TypeError):
+        return pl
+    if not isinstance(root, dict):
+        return pl
+
+    def _coerce_action_value(action: Any) -> None:
+        if not isinstance(action, dict):
+            return
+        val = action.get("value")
+        if not isinstance(val, str):
+            return
+        s = val.strip()
+        if not s or s[0] not in "{[":
+            return
+        try:
+            parsed = json.loads(val)
+        except json.JSONDecodeError:
+            return
+        if isinstance(parsed, dict):
+            action["value"] = parsed
+
+    ev = root.get("event")
+    if isinstance(ev, dict):
+        _coerce_action_value(ev.get("action"))
+    try:
+        return json.dumps(root, ensure_ascii=False).encode(UTF_8)
+    except (TypeError, ValueError):
+        return pl
+
+
 def _patch_lark_ws_card_callback() -> None:
     if getattr(Client._handle_data_frame, "_vc_agent_patched", False):
         return
@@ -132,7 +180,8 @@ def _patch_lark_ws_card_callback() -> None:
         try:
             start = int(round(time.time() * 1000))
             if message_type in (MessageType.EVENT, MessageType.CARD):
-                result = self._event_handler.do_without_validation(pl)
+                pl_use = _normalize_ws_payload_for_card_action(pl)
+                result = self._event_handler.do_without_validation(pl_use)
             else:
                 return
             end = int(round(time.time() * 1000))
@@ -191,7 +240,7 @@ def do_card_action_trigger(data: P2CardActionTrigger) -> P2CardActionTriggerResp
             LOG.exception("异步写入反馈失败: %s", exc)
 
     _executor.submit(_work)
-    return P2CardActionTriggerResponse({"toast": {"type": "success", "content": "已收到反馈，正在写入偏好库…"}})
+    return P2CardActionTriggerResponse({"toast": {"type": "success", "content": "成功写入偏好库"}})
 
 
 def main() -> None:
@@ -211,9 +260,25 @@ def main() -> None:
         .register_p2_card_action_trigger(do_card_action_trigger)
         .build()
     )
-    cli = Client(app_id, app_secret, LogLevel.INFO, handler)
-    LOG.info("飞书长连接（WSS）已启动；处理 card.action.trigger，Ctrl+C 退出")
-    cli.start()
+    raw_restart = (os.getenv("FEISHU_WS_RESTART_SEC") or "5").strip()
+    try:
+        restart_sec = float(raw_restart)
+    except ValueError:
+        restart_sec = 5.0
+    restart_sec = max(0.5, min(restart_sec, 600.0))
+
+    while True:
+        try:
+            cli = Client(app_id, app_secret, LogLevel.INFO, handler)
+            LOG.info("飞书长连接（WSS）建立中…；处理 card.action.trigger，Ctrl+C 退出")
+            cli.start()
+            LOG.warning("飞书长连接 Client.start() 已返回，%.1f 秒后重连", restart_sec)
+        except KeyboardInterrupt:
+            LOG.info("收到中断，退出")
+            raise SystemExit(0) from None
+        except Exception:
+            LOG.exception("飞书长连接异常，%.1f 秒后重连", restart_sec)
+        time.sleep(restart_sec)
 
 
 _patch_lark_ws_card_callback()

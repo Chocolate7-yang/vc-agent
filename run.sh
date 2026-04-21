@@ -27,6 +27,7 @@ usage() {
   test724 HH:MM          7x24 测试模式：临时设置 TEST_BRIEF_HOUR/MINUTE（无需改 .env）
 
   doctor | self-check    环境与链路自检（配置/网络/DB/简报）
+  feishu-ws | events     仅启动飞书卡片回调长连接（已加载 .env；前台日志，Ctrl+C 退出）
   help                   本说明
 
 环境变量（节选）:
@@ -36,7 +37,8 @@ usage() {
   TEST_BRIEF_HOUR / TEST_BRIEF_MINUTE   可选测试时刻；设置后会额外触发一次简报+飞书（默认关闭，不影响正式时刻）
   FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_RECEIVE_ID  飞书应用发消息必需项
   FEISHU_RECEIVE_ID_TYPE  默认 chat_id
-  已配置 FEISHU_APP_ID/SECRET 时，本脚本会后台启动 feishu_events.py（卡片 👍/👎 回调），日志见 logs/feishu_events.log
+  已配置 FEISHU_APP_ID/SECRET 时：7x24/自检等在脚本内后台拉起 feishu_events；一键 start 则在「飞书推送卡片」前由 Python 拉起（脱离 shell，日志仍见 logs/feishu_events.log）
+  FEISHU_WS_RESTART_SEC   feishu_events 断线重连间隔（秒），默认 5
   RUN_7X24_BOOTSTRAP     默认 1：7x24 启动前先同步跑一轮收料+简报；0 则交给调度器
 EOF
 }
@@ -78,21 +80,67 @@ PY="$ROOT/.venv/bin/python"
 export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 
 mkdir -p "$ROOT/logs"
-if [[ -n "${FEISHU_APP_ID:-}" ]] && [[ -n "${FEISHU_APP_SECRET:-}" ]]; then
-  if ! pgrep -f "vc_agent.feishu_events|[f]eishu_events.py" >/dev/null 2>&1; then
-    echo "📡 后台启动 feishu_events.py（飞书卡片 👍/👎 回调长连接）…"
-    nohup "$PY" -m vc_agent.feishu_events >>"$ROOT/logs/feishu_events.log" 2>&1 &
-    sleep 0.3
-    echo "   日志: $ROOT/logs/feishu_events.log"
+# 仅 7x24/doctor 等需要尽早后台长连接；一键 start 在简报前拉起（见下）；feishu-ws 为前台独占
+_feishu_ws_running() {
+  pgrep -f "vc_agent\.feishu_events" >/dev/null 2>&1 || pgrep -f "[f]eishu_events" >/dev/null 2>&1
+}
+# 一键收料可能很久，过早建 WSS 易空闲断线，飞书端会报「回调服务未在线」
+_feishu_ws_defer_until_daily_brief() {
+  case "$MODE" in
+    start|all|"") return 0 ;;
+    *) return 1 ;;
+  esac
+}
+_launch_feishu_ws_bg_if_configured() {
+  if [[ "$MODE" == "feishu-ws" || "$MODE" == "events" ]]; then
+    return 0
+  fi
+  if [[ -n "${FEISHU_APP_ID:-}" && -n "${FEISHU_APP_SECRET:-}" ]]; then
+    if ! _feishu_ws_running; then
+      echo "📡 后台启动 feishu_events（飞书卡片 👍/👎 长连接）…"
+      # 必须在当前 shell 里 nohup &，再 disown；勿用 ( subshell & )，
+      # 否则子 shell 退出时可能向后台发 SIGHUP，进程秒退（手动前台跑则正常）。
+      pushd "$ROOT" >/dev/null || exit 1
+      export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
+      nohup "$PY" -m vc_agent.feishu_events >>"$ROOT/logs/feishu_events.log" 2>&1 &
+      _feishu_pid=$!
+      # 从 job 表移除，避免非交互脚本结束时仍向该作业发 SIGHUP（nohup 子进程已忽略 SIGHUP，双保险）
+      disown "$_feishu_pid" 2>/dev/null || true
+      popd >/dev/null || true
+      sleep 3
+      if _feishu_ws_running; then
+        echo "   ✅ 已启动 · 日志: $ROOT/logs/feishu_events.log"
+      else
+        echo "   ⚠️  feishu_events 未能保持运行（卡片会提示「回调服务未在线」）" >&2
+        echo "   请查看: $ROOT/logs/feishu_events.log" >&2
+        if [[ -f "$ROOT/logs/feishu_events.log" ]]; then
+          echo "   --- 日志末尾 ---" >&2
+          tail -n 30 "$ROOT/logs/feishu_events.log" | sed 's/^/   /' >&2
+        fi
+      fi
+    else
+      echo "📡 feishu_events 已在运行，跳过"
+    fi
   else
-    echo "📡 feishu_events.py 已在运行，跳过"
+    if [[ -n "${FEISHU_APP_ID:-}" || -n "${FEISHU_APP_SECRET:-}" ]]; then
+      echo "⚠️  飞书凭证不完整（需同时配置 FEISHU_APP_ID 与 FEISHU_APP_SECRET），未启动 feishu_events" >&2
+    else
+      echo "ℹ️  未配置 FEISHU_APP_ID/FEISHU_APP_SECRET，未启动 feishu_events（仅推送简报、卡片按钮无回调）" >&2
+    fi
+  fi
+}
+if [[ "$MODE" != "feishu-ws" && "$MODE" != "events" ]]; then
+  if _feishu_ws_defer_until_daily_brief; then
+    echo "ℹ️  一键模式：飞书长连接将在「推送卡片」前由 Python 拉起（脱离 shell，避免 bash 结束后回调进程退出）"
+  else
+    _launch_feishu_ws_bg_if_configured
   fi
 fi
 
 case "$MODE" in
-  start|all|""|7x24|stack|unattended|daemon|doctor|self-check|test724) ;;
+  start|all|""|7x24|stack|unattended|daemon|doctor|self-check|test724|feishu-ws|events) ;;
   *)
-    echo "未知命令: $MODE（仅支持 start / 7x24 / test724）" >&2
+    echo "未知命令: $MODE（支持 start / 7x24 / test724 / feishu-ws / doctor）" >&2
     usage >&2
     exit 1
     ;;
@@ -143,6 +191,13 @@ run_with_bootstrap_progress() {
 }
 
 case "$MODE" in
+  feishu-ws|events)
+    echo ""
+    echo "  VC Agent · 飞书卡片回调（长连接，前台）"
+    echo "  ─────────────────────────────────────────"
+    echo "  已加载 $ROOT/.env · PYTHONPATH 已指向 src"
+    exec "$PY" -m vc_agent.feishu_events
+    ;;
   doctor|self-check)
     echo ""
     echo "  VC Agent · 自检模式"
@@ -152,6 +207,7 @@ import json
 import os
 import sqlite3
 import ssl
+import subprocess
 from pathlib import Path
 from urllib import request
 
@@ -159,8 +215,29 @@ root = Path.cwd()
 data = root / "data"
 db = data / "vc_agent.db"
 brief = root / "src" / "vc_agent" / "data" / "brief_latest.json"
+log_feishu = root / "logs" / "feishu_events.log"
 print(f"[CHECK] PYTHONPATH={os.getenv('PYTHONPATH','')}")
 print(f"[CHECK] LLM key configured={'yes' if (os.getenv('QWEN_KEY') or os.getenv('OPENAI_API_KEY')) else 'no'}")
+if os.getenv("FEISHU_APP_ID") and os.getenv("FEISHU_APP_SECRET"):
+    r = subprocess.run(
+        ["pgrep", "-f", "vc_agent.feishu_events|feishu_events.py"],
+        capture_output=True,
+        text=True,
+    )
+    if r.returncode == 0:
+        print("[CHECK] feishu_events: process running (card callback WSS)")
+    else:
+        print("[WARN] feishu_events: not running — 卡片 👍/👎 会提示「回调服务未在线」；请执行: bash run.sh feishu-ws（或 bash run.sh start 会自动后台拉起）")
+    if log_feishu.is_file():
+        try:
+            tail = log_feishu.read_text(encoding="utf-8", errors="replace").splitlines()[-8:]
+            print("[CHECK] feishu_events.log (last lines):")
+            for line in tail:
+                print("       ", line[:200])
+        except OSError as exc:
+            print(f"[WARN] feishu_events.log read fail: {exc}")
+else:
+    print("[CHECK] feishu_events: skipped (no FEISHU_APP_ID/FEISHU_APP_SECRET)")
 try:
     insecure = str(os.getenv("ALLOW_INSECURE_SSL", "")).lower() in {"1", "true", "yes", "on"}
     ctx = ssl._create_unverified_context() if insecure else ssl.create_default_context()

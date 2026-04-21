@@ -48,10 +48,9 @@ cp .env.example .env
 
 4. 启动本地长连接并完成验证
 
-```bash
-set -a && source .env && set +a
-PYTHONPATH=src .venv/bin/python -m vc_agent.feishu_events
-```
+   - **推荐**：`bash run.sh start` 或 `bash run.sh 7x24` 会在加载根目录 `.env` 后**自动后台**启动 `feishu_events`（无需再手敲 `source .env`）；日志见 `logs/feishu_events.log`，终端会显示 `✅ 已启动` 或报错与日志末尾。
+   - **仅调试长连接（前台）**：`bash run.sh feishu-ws`
+   - 或手动：`set -a && source .env && set +a && PYTHONPATH=src .venv/bin/python -m vc_agent.feishu_events`
 
    - 终端出现 `connected to wss://...` 后，在开发者后台完成：
    - 事件配置 -> 订阅方式“长连接” -> 验证成功 -> 保存

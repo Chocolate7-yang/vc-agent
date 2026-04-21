@@ -785,14 +785,15 @@ def _merge_group_dict_from_llm(
     kp = [str(x).strip() for x in kp[:2] if str(x).strip()]
     while len(kp) < 2:
         kp.append("可对照原文核实数据与口径")
-    sig_line = f"「{tier}」逻辑：{logic[:120]}" if logic else f"「{tier}」逻辑：合并组内信号取等级为「{tier}」。"
+    sig_line = f"「{tier}」逻辑：{logic}" if logic else f"「{tier}」逻辑：合并组内信号取等级为「{tier}」。"
+    base_ol = str(pack[idxs[0]][1].get("one_line") or "").strip()
     return {
-        "title_zh": title_zh[:44] or "合并条目",
-        "subject": str(pack[idxs[0]][1].get("subject") or "")[:60],
-        "why_matters": body[:200] if body else topic + " 赛道相关动态。",
-        "one_line": body[:100] if body else (pack[idxs[0]][1].get("one_line") or "")[:80],
-        "key_points": [kp[0][:40], kp[1][:40]],
-        "investment_signal": [sig_line[:200]],
+        "title_zh": title_zh or "合并条目",
+        "subject": str(pack[idxs[0]][1].get("subject") or "").strip(),
+        "why_matters": body if body else topic + " 赛道相关动态。",
+        "one_line": "" if body else base_ol,
+        "key_points": [kp[0], kp[1]],
+        "investment_signal": [sig_line],
         "meta_source_count": len(idxs),
     }
 
@@ -811,21 +812,21 @@ def _merge_group_dict_from_indices(
     tiers = [_tier_from_signal_line((pack[i][1].get("investment_signal") or [""])[0]) for i in idxs]
     tier = merge_signal_tiers(tiers)
     parts = [str(pack[i][1].get("one_line") or "").strip() for i in idxs]
-    body = " ".join(x for x in parts if x)[:200]
+    body = " ".join(x for x in parts if x)
     if len(idxs) > 1:
         body = f"综合自 {len(idxs)} 篇相关报道。" + (body if body else "")
     tz = str(pack[idxs[0]][1].get("title_zh") or "").strip()
-    kp1 = str((pack[idxs[0]][1].get("key_points") or [""])[0] if pack[idxs[0]][1].get("key_points") else "")[:28]
-    kp2 = str((pack[idxs[1]][1].get("key_points") or [""])[0] if len(idxs) > 1 and pack[idxs[1]][1].get("key_points") else "")[:28]
+    kp1 = str((pack[idxs[0]][1].get("key_points") or [""])[0] if pack[idxs[0]][1].get("key_points") else "")
+    kp2 = str((pack[idxs[1]][1].get("key_points") or [""])[0] if len(idxs) > 1 and pack[idxs[1]][1].get("key_points") else "")
     kps = [kp1 or "对照组内原文交叉验证", kp2 or "关注后续财报与订单"]
     sig_line = f"「{tier}」逻辑：{merge_signal_logic}"
     return {
-        "title_zh": tz[:44] or "合并条目",
-        "subject": str(pack[idxs[0]][1].get("subject") or "")[:60],
-        "why_matters": body[:200],
-        "one_line": body[:100],
-        "key_points": [kps[0][:40], kps[1][:40]],
-        "investment_signal": [sig_line[:200]],
+        "title_zh": tz or "合并条目",
+        "subject": str(pack[idxs[0]][1].get("subject") or "").strip(),
+        "why_matters": body,
+        "one_line": "",
+        "key_points": [kps[0], kps[1]],
+        "investment_signal": [sig_line],
         "meta_source_count": len(idxs),
     }
 
@@ -864,11 +865,9 @@ def build_merged_brief_rows(
     return rows
 
 
-def _short_zh_title(raw_title: str, max_len: int = 22) -> str:
-    t = (raw_title or "").strip()
-    if len(t) <= max_len:
-        return t
-    return t[: max_len - 1] + "…"
+def _fallback_title_zh(raw_title: str) -> str:
+    """无模型标题时使用完整原文标题，不在简报中省略。"""
+    return (raw_title or "").strip()
 
 
 def _finalize_summary_dict(data: Dict[str, Any], item: ScoredItem) -> Dict[str, Any]:
@@ -882,16 +881,16 @@ def _finalize_summary_dict(data: Dict[str, Any], item: ScoredItem) -> Dict[str, 
         sig = []
     sig = [str(x).strip() for x in sig[:1] if str(x).strip()]
     subject = str(data.get("subject") or "").strip() or "无明确主体"
-    title_zh = str(data.get("title_zh") or "").strip() or _short_zh_title(item.raw.title)
+    title_zh = str(data.get("title_zh") or "").strip() or _fallback_title_zh(item.raw.title)
     why = str(data.get("why_matters") or "").strip() or "待结合原文判断与细分赛道的关联。"
     one_line = str(data.get("one_line") or "").strip() or f"{item.topic} 相关动态，建议查看摘要与原文。"
     out = {
-        "title_zh": title_zh[:40],
-        "subject": subject[:60],
-        "why_matters": why[:80],
-        "one_line": one_line[:80],
-        "key_points": [x[:40] for x in kp[:2]],
-        "investment_signal": [x[:200] for x in sig[:1]],
+        "title_zh": title_zh,
+        "subject": subject,
+        "why_matters": why,
+        "one_line": one_line,
+        "key_points": kp[:2],
+        "investment_signal": sig[:1],
         "meta_source_count": int(data.get("meta_source_count") or 1),
     }
     return out
@@ -930,7 +929,7 @@ def llm_summarize(item: ScoredItem) -> Dict[str, Any]:
     if not api_key or not base_url:
         return _finalize_summary_dict(
             {
-                "title_zh": _short_zh_title(item.raw.title),
+                "title_zh": _fallback_title_zh(item.raw.title),
                 "subject": "无明确主体",
                 "why_matters": "无 API Key，仅依据标题与简介占位。",
                 "one_line": f"{item.topic} 相关公开内容更新。",
@@ -975,10 +974,10 @@ def llm_summarize(item: ScoredItem) -> Dict[str, Any]:
             print(f"[WARN] LLM 摘要失败，使用降级摘要: {exc}")
         return _finalize_summary_dict(
             {
-                "title_zh": _short_zh_title(item.raw.title),
+                "title_zh": _fallback_title_zh(item.raw.title),
                 "subject": "无明确主体",
                 "why_matters": "摘要生成失败，请直接阅读原文判断相关性。",
-                "one_line": f"{item.topic} 条目：{item.raw.title[:28]}",
+                "one_line": f"{item.topic} 条目：{_fallback_title_zh(item.raw.title)}",
                 "key_points": ["本条未完成 LLM 结构化摘要", "以原文与频道背景为准"],
                 "investment_signal": ["「建议跟踪」逻辑：摘要生成失败，结论以原文为准。"],
                 "meta_source_count": 1,
@@ -1021,10 +1020,19 @@ def _topic_section_heading(topic: str) -> str:
 
 
 def _brief_max_per_topic() -> int:
-    try:
-        max_per = int(load_env("BRIEF_MAX_PER_TOPIC", "5") or "5")
-    except ValueError:
-        max_per = 5
+    """展示条数上限；默认与 BRIEF_PER_TOPIC 一致，避免出现 4/5（入选 5 条却只展示 4 条）。
+    仅当显式设置 BRIEF_MAX_PER_TOPIC 时才覆盖。"""
+    explicit = (load_env("BRIEF_MAX_PER_TOPIC") or "").strip()
+    if explicit:
+        try:
+            max_per = int(explicit)
+        except ValueError:
+            max_per = 5
+    else:
+        try:
+            max_per = int(load_env("BRIEF_PER_TOPIC", "5") or "5")
+        except ValueError:
+            max_per = 5
     return max(1, min(max_per, 12))
 
 
@@ -1077,7 +1085,7 @@ def build_brief_payload(
     insights: List[str],
     stats: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """供 Web 与 SQLite 后端共用的简报 JSON 结构。"""
+    """供飞书推送、SQLite 等共用的简报 JSON 结构。"""
     max_per = _brief_max_per_topic()
     today = datetime.now().strftime("%Y-%m-%d")
     sections_out: List[Dict[str, Any]] = []
@@ -1091,7 +1099,7 @@ def build_brief_payload(
                 {
                     "url": row.links[0],
                     "urls": list(row.links),
-                    "title": (sm.get("title_zh") or _short_zh_title(primary.raw.title)).strip(),
+                    "title": (sm.get("title_zh") or _fallback_title_zh(primary.raw.title)).strip(),
                     "content": _merge_content_summary(sm),
                     "signal": (sm.get("investment_signal") or ["「建议跟踪」逻辑：信号待补充"])[0],
                     "source": _row_source_label(row),
@@ -1202,7 +1210,7 @@ def llm_daily_core_insights(brief_rows: List[BriefRow]) -> List[str]:
             sig = (sm.get("investment_signal") or [""])[0]
             tz = str(sm.get("title_zh") or "").strip() or "（无标题）"
             ol = str(sm.get("one_line") or "").strip()
-            pack.append(f"[{t}] {tz[:40]} / {ol[:60]} / 信号:{sig[:48]}")
+            pack.append(f"[{t}] {tz} / {ol} / 信号:{sig}")
     bundle = "\n".join(pack) if pack else "（无入选摘要）"
 
     api_key, model, base_url = _resolve_llm_config()
@@ -1211,7 +1219,7 @@ def llm_daily_core_insights(brief_rows: List[BriefRow]) -> List[str]:
         for t in topics_order:
             if by_topic[t]:
                 sm = by_topic[t][0].merged_summary
-                out.append((sm.get("one_line") or f"{t} 赛道有更新。")[:52])
+                out.append(sm.get("one_line") or f"{t} 赛道有更新。")
         while len(out) < 3:
             out.append("详见下方分栏原文与摘要。")
         return out[:3]
@@ -1256,7 +1264,7 @@ def llm_daily_core_insights(brief_rows: List[BriefRow]) -> List[str]:
         out = [str(x).strip() for x in ins[:3] if str(x).strip()]
         while len(out) < 3:
             out.append("详见下文分栏要点。")
-        return [s[:80] for s in out[:3]]
+        return out[:3]
     except Exception as exc:
         if not _env_quiet():
             print(f"[WARN] 核心洞察 LLM 失败，使用降级: {exc}")
@@ -1264,7 +1272,7 @@ def llm_daily_core_insights(brief_rows: List[BriefRow]) -> List[str]:
         for t in topics_order:
             if by_topic[t]:
                 sm = by_topic[t][0].merged_summary
-                out.append((sm.get("one_line") or f"{t} 方向有更新。")[:52])
+                out.append(sm.get("one_line") or f"{t} 方向有更新。")
         while len(out) < 3:
             out.append("详见下方分栏。")
         return out[:3]
@@ -1300,7 +1308,7 @@ def compose_markdown(
         for row in chunk:
             sm = row.merged_summary
             primary = row.scored_items[0]
-            title_line = (sm.get("title_zh") or _short_zh_title(primary.raw.title)).strip()
+            title_line = (sm.get("title_zh") or _fallback_title_zh(primary.raw.title)).strip()
             lines.append(f"**标题：** {title_line}")
             lines.append(f"**内容总结：** {_merge_content_summary(sm)}")
             sig = (sm.get("investment_signal") or ["「建议跟踪」逻辑：信号待补充"])[0]
@@ -1312,7 +1320,9 @@ def compose_markdown(
                 tail = f"{src}" + (f" · @{author}" if author and author != "unknown" else "")
                 label = "原文链接" if len(row.links) == 1 else f"原文链接（{j + 1}/{len(row.links)}）"
                 lines.append(f"**{label}：** [🔗]({url}) {tail}")
-            lines.append("**用户反馈：** 请在 Web 简报页对相应条目点击 👍 / 👎。")
+            lines.append(
+                "**用户反馈：** 若已配置飞书推送，请在群内简报卡片中展开对应赛道，在条目下点击 👍 / 👎。"
+            )
             lines.append("")
 
     lines.append("## 📊 本日数据统计")
@@ -1326,7 +1336,9 @@ def compose_markdown(
     if ph:
         lines.append(f"- **偏好反馈**：{ph}")
     lines.append("")
-    lines.append("简报由 **VC 信息聚合 Agent** 自动生成。欢迎在页面提交 👍/👎 反馈以优化后续排序。")
+    lines.append(
+        "简报由 **VC 信息聚合 Agent** 自动生成。欢迎通过飞书卡片 👍/👎 或命令行 `python -m vc_agent.feedback` 提交反馈以优化后续排序。"
+    )
     return "\n".join(lines)
 
 

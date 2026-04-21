@@ -1,3 +1,6 @@
+'''
+测试排序与评分
+'''
 import unittest
 
 from vc_agent.agent import RawItem, classify_and_score, deduplicate

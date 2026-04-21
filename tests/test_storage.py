@@ -1,3 +1,6 @@
+'''
+测试 SQLite 数据库的持久化与查询
+'''
 import tempfile
 import unittest
 from pathlib import Path

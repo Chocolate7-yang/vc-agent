@@ -1,3 +1,6 @@
+'''
+测试飞书推送的卡片构建
+'''
 import json
 import unittest
 from typing import Any, Dict, List

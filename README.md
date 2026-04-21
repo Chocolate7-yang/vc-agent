@@ -4,6 +4,12 @@
 
 简报示例：https://applink.feishu.cn/client/message/link/open?token=AmnhOZk%2BAAvHaefKuSHADNw%3D
 
+### 演示视频
+
+<video src="demo/demo.mov" controls playsinline width="100%"></video>
+
+若内嵌无法播放，请本地打开 [`demo/demo.mov`](demo/demo.mov)。
+
 ### 网络准备（VPN）
 
 当前主数据源是 YouTube RSS，运行时需要访问 `youtube.com`。

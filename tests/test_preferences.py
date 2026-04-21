@@ -1,3 +1,6 @@
+'''
+测试偏好学习的持久化与重算
+'''
 import json
 import tempfile
 import unittest

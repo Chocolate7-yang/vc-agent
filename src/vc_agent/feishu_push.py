@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 """
-飞书应用模式推送：在每日简报生成成功后推送 interactive 卡片（折叠分栏 + Markdown；
-每条含原文链接时在折叠内附 👍/👎 回调按钮，点击写入 preferences）。
+飞书应用模式推送：在每日简报生成成功后向群聊发消息。
+
+- 默认（FEISHU_PUSH_MODE=card）：interactive 卡片（折叠分栏 + Markdown；含原文链接时有 👍/👎）。
+- FEISHU_PUSH_MODE=doc：创建飞书云文档并发送文本消息中的文档链接（便于对外分享，无卡片回调）。
+- FEISHU_PUSH_MODE=both：先云文档链接，再发卡片。
+
+接收方：`FEISHU_APP_ID` / `FEISHU_APP_SECRET` 配好后，**未填** `FEISHU_RECEIVE_ID` 时向机器人所在全部群推送
+（与 `feishu_list_chats` 同源接口拉会话列表）；若填写 `FEISHU_RECEIVE_ID` 则只向该会话发（单群或 `open_id` 单聊）。
+
 推送失败仅打日志，不影响简报落盘与后续调度。
 """
 
@@ -23,6 +30,23 @@ _FeedbackDetail = Literal["full", "minimal", "none"]
 def _env(name: str, default: Optional[str] = None) -> Optional[str]:
     v = os.getenv(name, default)
     return (v or "").strip() or None
+
+
+def _feishu_push_max_chats() -> int:
+    raw = (_env("FEISHU_PUSH_MAX_CHATS") or "100").strip()
+    try:
+        n = int(raw or "100")
+    except ValueError:
+        n = 100
+    return max(1, min(n, 500))
+
+
+def _feishu_push_mode() -> str:
+    """card：仅交互卡片（默认）；doc：仅云文档 + 文本链接；both：先云文档再卡片。"""
+    m = ((_env("FEISHU_PUSH_MODE") or "card")).strip().lower()
+    if m in {"card", "doc", "both"}:
+        return m
+    return "card"
 
 
 def _escape_md_line(s: str) -> str:
@@ -343,12 +367,12 @@ def push_daily_brief_to_feishu(
 ) -> None:
     """
     简报已成功写入磁盘后调用；失败仅记录日志。
-    md_text 与 web_payload 同源；推送以结构化卡片呈现，内容与 Markdown 简报一致。
+    md_text 与 web_payload 同源；卡片模式以结构化卡片呈现；云文档模式将 md_text 写入新建 docx。
     """
     _ensure_logging()
-    has_app = bool(_env("FEISHU_APP_ID") and _env("FEISHU_APP_SECRET") and _env("FEISHU_RECEIVE_ID"))
+    has_app = bool(_env("FEISHU_APP_ID") and _env("FEISHU_APP_SECRET"))
     if not has_app:
-        LOG.debug("未配置 FEISHU_APP_ID/FEISHU_APP_SECRET/FEISHU_RECEIVE_ID，跳过飞书推送")
+        LOG.debug("未配置 FEISHU_APP_ID/FEISHU_APP_SECRET，跳过飞书推送")
         return
 
     if (_env("VC_AGENT_BOOTSTRAP_BRIEF") or "").lower() in {"1", "true", "yes", "on"}:
@@ -358,27 +382,110 @@ def push_daily_brief_to_feishu(
             )
             return
 
-    _ = md_text  # 与简报文件一致已由上游写入；推送用 web_payload 结构化渲染
-
-    msg = build_interactive_message(web_payload, feedback_detail="full")
+    mode = _feishu_push_mode()
 
     try:
-        from .feishu_ws_ensure import ensure_feishu_events_before_card_push
+        from .feishu_app_send import (
+            collect_bot_chats,
+            get_tenant_access_token,
+            send_interactive_message,
+            send_text_message,
+        )
 
-        ensure_feishu_events_before_card_push()
-        from .feishu_app_send import send_interactive_from_env
+        date = str(web_payload.get("date") or "")
+        app_id = (_env("FEISHU_APP_ID") or "").strip()
+        app_secret = (_env("FEISHU_APP_SECRET") or "").strip()
+        if not app_id or not app_secret:
+            raise ValueError("飞书推送需要 FEISHU_APP_ID / FEISHU_APP_SECRET")
+        tok = get_tenant_access_token(app_id, app_secret)
 
-        app_card = msg.get("card")
-        if not isinstance(app_card, dict):
-            raise RuntimeError("interactive 消息缺少 card 字段")
-        resp = send_interactive_from_env(app_card)
-        data = resp.get("data") or {}
-        msg_id = data.get("message_id") or data.get("messageId") or ""
+        receive_id_type = (_env("FEISHU_RECEIVE_ID_TYPE") or "chat_id").strip() or "chat_id"
+        targets: List[tuple[str, str, str]] = []
+        rid = (_env("FEISHU_RECEIVE_ID") or "").strip()
+        if rid:
+            targets.append((rid, receive_id_type, ""))
+            LOG.info("飞书推送：单会话 FEISHU_RECEIVE_ID（%s）", receive_id_type)
+        else:
+            chats = collect_bot_chats(tok, page_size=100)
+            cap = _feishu_push_max_chats()
+            if len(chats) > cap:
+                LOG.warning("机器人可见群数 %s 超过 FEISHU_PUSH_MAX_CHATS=%s，仅推送前 %s 个", len(chats), cap, cap)
+                chats = chats[:cap]
+            for it in chats:
+                cid = str(it.get("chat_id") or "").strip()
+                if cid:
+                    name = str(it.get("name") or "").strip()
+                    targets.append((cid, "chat_id", name))
+            if not targets:
+                LOG.warning(
+                    "未配置 FEISHU_RECEIVE_ID 但未获取到任何群会话（请先将机器人拉进群并检查开放平台群列表权限）"
+                )
+                return
+            LOG.info("飞书推送：机器人所在全部群，共 %s 个会话", len(targets))
+
+        doc_msg_ids: List[str] = []
+        card_msg_ids: List[str] = []
+
+        if mode in {"doc", "both"}:
+            from .feishu_docx import create_docx_from_markdown
+
+            title = f"每日投资信息简报 · VC Agent · {date}"[:800]
+            folder = _env("FEISHU_DOC_FOLDER_TOKEN")
+            _, doc_url = create_docx_from_markdown(
+                tok,
+                title=title,
+                markdown=md_text,
+                folder_token=folder,
+            )
+            doc_line = (
+                "📄 今日简报已写入飞书云文档，可复制链接分享（组织外可见请在文档右上角「分享」中单独开启）。\n"
+                f"{doc_url}"
+            )
+            for recv_id, recv_type, gname in targets:
+                try:
+                    r_doc = send_text_message(
+                        tenant_access_token=tok,
+                        receive_id=recv_id,
+                        receive_id_type=recv_type,
+                        text=doc_line,
+                    )
+                    d_doc = r_doc.get("data") or {}
+                    doc_msg_ids.append(str(d_doc.get("message_id") or d_doc.get("messageId") or ""))
+                    LOG.info("飞书云文档链接已发送至 chat=%s name=%r", recv_id, gname or "?")
+                except Exception as exc_one:
+                    LOG.error("飞书文本（云文档链接）发送至 %s 失败: %s", recv_id, exc_one, exc_info=True)
+
+        if mode in {"card", "both"}:
+            msg = build_interactive_message(web_payload, feedback_detail="full")
+            from .feishu_ws_ensure import ensure_feishu_events_before_card_push
+
+            ensure_feishu_events_before_card_push()
+            app_card = msg.get("card")
+            if not isinstance(app_card, dict):
+                raise RuntimeError("interactive 消息缺少 card 字段")
+            for recv_id, recv_type, gname in targets:
+                try:
+                    resp = send_interactive_message(
+                        tenant_access_token=tok,
+                        receive_id=recv_id,
+                        receive_id_type=recv_type,
+                        card=app_card,
+                    )
+                    data = resp.get("data") or {}
+                    card_msg_ids.append(str(data.get("message_id") or data.get("messageId") or ""))
+                    LOG.info("飞书卡片已发送至 chat=%s name=%r", recv_id, gname or "?")
+                except Exception as exc_one:
+                    LOG.error("飞书卡片发送至 %s 失败: %s", recv_id, exc_one, exc_info=True)
+
         LOG.info(
-            "飞书推送成功（应用发消息）：brief_id=%s，本地文件=%s，message_id=%s",
+            "飞书推送完成（应用发消息）：brief_id=%s，本地文件=%s，mode=%s，"
+            "targets=%s，doc_message_ids=%s，card_message_ids=%s",
             brief_id,
             md_path,
-            msg_id,
+            mode,
+            len(targets),
+            doc_msg_ids,
+            card_msg_ids,
         )
         return
     except Exception as exc:

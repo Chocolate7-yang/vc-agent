@@ -35,7 +35,8 @@ usage() {
   PIPELINE_INTERVAL_HOURS  默认 4（仅 7x24）
   BRIEF_HOUR / BRIEF_MINUTE / BRIEF_TZ  晨间简报时刻（默认 7:00 北京时间）
   TEST_BRIEF_HOUR / TEST_BRIEF_MINUTE   可选测试时刻；设置后会额外触发一次简报+飞书（默认关闭，不影响正式时刻）
-  FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_RECEIVE_ID  飞书应用发消息必需项
+  FEISHU_APP_ID / FEISHU_APP_SECRET  飞书应用发消息必需项
+  FEISHU_RECEIVE_ID  可选；留空则向机器人所在全部群推送，填写则只推该会话
   FEISHU_RECEIVE_ID_TYPE  默认 chat_id
   已配置 FEISHU_APP_ID/SECRET 时：7x24/自检等在脚本内后台拉起 feishu_events；一键 start 则在「飞书推送卡片」前由 Python 拉起（脱离 shell，日志仍见 logs/feishu_events.log）
   FEISHU_WS_RESTART_SEC   feishu_events 断线重连间隔（秒），默认 5

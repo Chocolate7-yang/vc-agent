@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import sys
 
-from .feishu_app_send import get_tenant_access_token, list_bot_chats
+from .feishu_app_send import collect_bot_chats, get_tenant_access_token
 
 
 def _hint_for_feishu_err(msg: str) -> str:
@@ -27,7 +27,7 @@ def main() -> None:
         sys.exit(1)
     tok = get_tenant_access_token(app_id, app_secret)
     try:
-        data = list_bot_chats(tok, page_size=100)
+        items = collect_bot_chats(tok, page_size=100)
     except RuntimeError as e:
         err = str(e)
         print(err, file=sys.stderr)
@@ -35,7 +35,6 @@ def main() -> None:
         if hint:
             print(hint, file=sys.stderr)
         sys.exit(1)
-    items = data.get("items") or []
     if not items:
         print("（无群或未进群：请先把机器人加入群，并检查应用权限）")
         return

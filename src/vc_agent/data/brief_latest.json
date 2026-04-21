@@ -1,21 +1,21 @@
 {
-  "brief_id": "brief_20260422_024617",
+  "brief_id": "brief_20260422_070713",
   "date": "2026-04-22",
   "insights": [
-    "AI法律工具推动服务效率提升，潜在市场增长空间大，值得关注。",
-    "EUV光刻技术突破提升芯片制造效率，ASML技术展示增强市场信心。",
-    "人形机器人技术升级强化应用能力，或提升产品竞争力。"
+    "企业AI代理平台加速演进，推动效率与能力提升，展现增长潜力。",
+    "High NA EUV光刻技术突破提升芯片制造效率，凸显关键部件核心作用。",
+    "人形机器人技术升级增强产品竞争力，但商业化进展仍需观察。"
   ],
   "stats": {
-    "monitored_total": 90,
+    "monitored_total": 118,
     "passed_count": 15,
     "platform_dist_brief": {
       "YouTube": 15
     },
-    "pref_hint": "已积累 35 条用户反馈，用于优化内容排序。",
+    "pref_hint": "已积累 45 条用户反馈，用于优化内容排序。",
     "coverage_ratio": 1.0,
     "novelty_ratio_7d": 1.0,
-    "feedback_coverage_ratio": 0.1333,
+    "feedback_coverage_ratio": 0.3333,
     "exploration_ratio": 0.1
   },
   "sections": [
@@ -25,30 +25,6 @@
       "shown": 5,
       "total": 5,
       "items": [
-        {
-          "url": "https://www.youtube.com/watch?v=Y-jsJUngyFU",
-          "urls": [
-            "https://www.youtube.com/watch?v=Y-jsJUngyFU"
-          ],
-          "title": "AI法律服务新尝试",
-          "content": "Harvey开发AI法律工具，推动流程自动化与效率提升 AI在法律行业的应用，可能影响专业服务模式和效率 AI律师处理复杂流程，平衡人工与自动化 聚焦大型律所，影响计费模式。",
-          "signal": "利好：AI提升法律服务效率，潜在市场增长空间大",
-          "source": "YouTube",
-          "author": "Greylock",
-          "topic": "AI"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=a-YJ6h7EJv8",
-          "urls": [
-            "https://www.youtube.com/watch?v=a-YJ6h7EJv8"
-          ],
-          "title": "AI助力生命科学决策",
-          "content": "OpenAI推出AI工具辅助生命科学研究决策 推动生命科学领域研究决策的AI工具，可能影响相关投融资方向 AI支持科研流程中的假设生成 提升生命科学领域研究效率。",
-          "signal": "利好: 提升科研效率，或吸引相关领域投资",
-          "source": "YouTube",
-          "author": "OpenAI",
-          "topic": "AI"
-        },
         {
           "url": "https://www.youtube.com/watch?v=1ZMDA6atOhc",
           "urls": [
@@ -83,6 +59,30 @@
           "signal": "风险: AI 可能冲击现有互联网商业模式",
           "source": "YouTube",
           "author": "Sequoia Capital",
+          "topic": "AI"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=flweA_I-VKE",
+          "urls": [
+            "https://www.youtube.com/watch?v=flweA_I-VKE"
+          ],
+          "title": "Hearth AI 创始人 Ashe Magalhaes 谈 AI 工具与效率",
+          "content": "Hearth AI 创始人分享 AI 工具与效率提升方法论 聚焦 AI 工具开发与个人效率系统，或影响 AI 应用层投资方向 讨论 AI 工具在个人工作流中的应用 展示 AI 如何增强人类连接与专注。",
+          "signal": "利好: AI 工具创新可能吸引开发者关注",
+          "source": "YouTube",
+          "author": "OpenAI",
+          "topic": "AI"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=OAlHiQLsYQM",
+          "urls": [
+            "https://www.youtube.com/watch?v=OAlHiQLsYQM"
+          ],
+          "title": "AI助力癌症治疗方案优化",
+          "content": "AI辅助癌症治疗方案探索，推动医患科研协作新模式 展示AI在医疗个性化治疗中的应用潜力，与AI+医疗赛道相关 使用ChatGPT分析肿瘤数据 建立患者-医生-文献反馈机制。",
+          "signal": "利好: AI提升医疗决策效率",
+          "source": "YouTube",
+          "author": "OpenAI",
           "topic": "AI"
         }
       ]

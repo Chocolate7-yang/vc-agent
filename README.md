@@ -4,9 +4,10 @@
 
 ### 简报演示视频
 
-<video src="demo/demo.mov" controls playsinline width="100%"></video>
+<!-- README 内 <video> 需 raw 绝对地址；Fork 后请改「用户/仓库」。 -->
+<video src="https://raw.githubusercontent.com/Chocolate7-yang/vc-agent/main/demo/demo.mov" controls playsinline width="100%"></video>
 
-若内嵌无法播放，请本地打开 [`demo/demo.mov`](demo/demo.mov)。
+若播放器空白，多为 Chrome 对当前 `.mov` 编码不兼容，可换 Safari 试播，或改为 **H.264/AAC 的 `demo.mp4`** 并同步修改上一行 URL。需要 GitHub 官方「链接独占一行即内嵌」时：把 ≤10MB 的 mp4 拖到 Issue 评论，复制 `https://github.com/user-attachments/assets/...` 单独一行贴到 README 即可。
 
 ### 网络准备（VPN）
 

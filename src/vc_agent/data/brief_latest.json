@@ -1,21 +1,21 @@
 {
-  "brief_id": "brief_20260422_070713",
+  "brief_id": "brief_20260422_071137",
   "date": "2026-04-22",
   "insights": [
     "企业AI代理平台加速演进，推动效率与能力提升，展现增长潜力。",
-    "High NA EUV光刻技术突破提升芯片制造效率，凸显关键部件核心作用。",
-    "人形机器人技术升级增强产品竞争力，但商业化进展仍需观察。"
+    "ASML展示EUV光刻技术关键部件，增强市场对芯片制造信心。",
+    "机器人学习借鉴儿童发展机制，或影响未来技术路线。"
   ],
   "stats": {
-    "monitored_total": 118,
+    "monitored_total": 126,
     "passed_count": 15,
     "platform_dist_brief": {
       "YouTube": 15
     },
-    "pref_hint": "已积累 45 条用户反馈，用于优化内容排序。",
+    "pref_hint": "已积累 46 条用户反馈，用于优化内容排序。",
     "coverage_ratio": 1.0,
     "novelty_ratio_7d": 1.0,
-    "feedback_coverage_ratio": 0.3333,
+    "feedback_coverage_ratio": 0.2667,
     "exploration_ratio": 0.1
   },
   "sections": [
@@ -162,54 +162,6 @@
       "total": 5,
       "items": [
         {
-          "url": "https://www.youtube.com/watch?v=wL0-Pu_8F0U",
-          "urls": [
-            "https://www.youtube.com/watch?v=wL0-Pu_8F0U"
-          ],
-          "title": "Atlas 工业人形设计解析",
-          "content": "Boston Dynamics 发布 Atlas 工业版，强调实用而非拟人 展示人形机器人工业应用方向，影响未来布局 工业场景需求主导设计 模块化架构提升适应性。",
-          "signal": "中性偏弱逻辑：未提及融资或商业化进展",
-          "source": "YouTube",
-          "author": "Boston Dynamics",
-          "topic": "机器人"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=VeutCk1xYzI",
-          "urls": [
-            "https://www.youtube.com/watch?v=VeutCk1xYzI"
-          ],
-          "title": "人形机器人足部路径规划技术更新",
-          "content": "Agility升级Digit导航系统，强化实际应用能力 涉及人形机器人核心导航技术，可能影响产业布局与投资方向 Digit导航栈重构细节待进一步披露 足部路径规划技术提升实际部署效率。",
-          "signal": "利好：技术升级有助于增强产品竞争力",
-          "source": "YouTube",
-          "author": "Agility",
-          "topic": "机器人"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=sd8ivhpjI6g",
-          "urls": [
-            "https://www.youtube.com/watch?v=sd8ivhpjI6g"
-          ],
-          "title": "波士顿动力发布Atlas机器人",
-          "content": "波士顿动力推出Atlas机器人，或推动工业自动化投资增长 展示工业级人形机器人技术进展，可能影响未来制造业投资方向 Atlas产品版本正式发布 首次在客户现场部署。",
-          "signal": "利好：逻辑：展示商业化落地进展，增强投资者信心",
-          "source": "YouTube",
-          "author": "Boston Dynamics",
-          "topic": "机器人"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=kBwxmlI2yHQ",
-          "urls": [
-            "https://www.youtube.com/watch?v=kBwxmlI2yHQ"
-          ],
-          "title": "AI视觉升级，机器人更智能",
-          "content": "Boston Dynamics推出AI视觉升级，提升机器人智能水平 涉及机器人与AI结合，可能影响行业技术方向 Spot和Orbit的视觉能力增强 AIVI-Learning基于Google Gemini Robotics。",
-          "signal": "利好：技术升级可能提升产品竞争力",
-          "source": "YouTube",
-          "author": "Boston Dynamics",
-          "topic": "机器人"
-        },
-        {
           "url": "https://www.youtube.com/watch?v=pN_bj5-QyW8",
           "urls": [
             "https://www.youtube.com/watch?v=pN_bj5-QyW8"
@@ -219,6 +171,54 @@
           "signal": "利好：数据集有助于提升技术竞争力",
           "source": "YouTube",
           "author": "Unitree Robotics",
+          "topic": "机器人"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=ry8itipzBFE",
+          "urls": [
+            "https://www.youtube.com/watch?v=ry8itipzBFE"
+          ],
+          "title": "机器人学习借鉴儿童发展",
+          "content": "Jitendra Malik提出机器人学习可借鉴儿童发展机制 涉及机器人学习方法，或影响技术路径选择 研究儿童运动技能获取方式 探索多模态感知在机械操作中的应用。",
+          "signal": "建议跟踪：逻辑：提出新学习方法，可能影响机器人技术路线",
+          "source": "YouTube",
+          "author": "CMU Robotics Institute",
+          "topic": "机器人"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=dRidNHIkCIA",
+          "urls": [
+            "https://www.youtube.com/watch?v=dRidNHIkCIA"
+          ],
+          "title": "机器人手部灵巧性研究进展",
+          "content": "CMU教授分享机器人手部灵巧性技术路径，或影响未来人机协作方向 聚焦机器人手部灵巧性，与机器人应用能力提升直接相关 灵巧操作是机器人核心挑战之一 研究人类抓取策略并应用于机器人。",
+          "signal": "中性偏弱：内容偏学术，未提及商业化或融资信息",
+          "source": "YouTube",
+          "author": "CMU Robotics Institute",
+          "topic": "机器人"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=ydnOSMbyyQo",
+          "urls": [
+            "https://www.youtube.com/watch?v=ydnOSMbyyQo"
+          ],
+          "title": "AI与机器人未来：从稀缺到丰饶",
+          "content": "AI与机器人可能重塑社会结构与劳动模式 探讨AI与机器人对劳动力市场的影响，涉及产业变革信号 AGI可能降低服务成本10倍 人类角色转向监督与协作。",
+          "signal": "建议跟踪：提出新工作模式，可能影响机器人应用场景",
+          "source": "YouTube",
+          "author": "CMU Robotics Institute",
+          "topic": "机器人"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=wL0-Pu_8F0U",
+          "urls": [
+            "https://www.youtube.com/watch?v=wL0-Pu_8F0U"
+          ],
+          "title": "Atlas工业人形设计解析",
+          "content": "Boston Dynamics发布Atlas工业版，强调实用而非拟人化 展示工业人形机器人设计逻辑，影响未来企业级机器人布局 工业场景优先，非娱乐用途 模块化架构提升可维护性。",
+          "signal": "中性偏弱逻辑：未提及融资或商业化进展",
+          "source": "YouTube",
+          "author": "Boston Dynamics",
           "topic": "机器人"
         }
       ]

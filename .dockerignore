@@ -1,0 +1,10 @@
+__pycache__
+*.py[cod]
+.git
+.gitignore
+.venv
+venv
+.env
+*.db-journal
+output
+.cursor

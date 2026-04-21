@@ -1,0 +1,53 @@
+{
+  "weights": {
+    "topic_relevance": 0.38,
+    "title_density": 0.12,
+    "summary_density": 0.12,
+    "freshness": 0.08,
+    "business_signal": 0.14,
+    "industry_position": 0.08,
+    "risk_penalty": 0.08
+  },
+  "signals": {
+    "business_positive": [
+      "order",
+      "orders",
+      "customer",
+      "customers",
+      "revenue",
+      "contract",
+      "production",
+      "mass production",
+      "量产",
+      "订单",
+      "收入",
+      "客户",
+      "签约"
+    ],
+    "industry_position": [
+      "upstream",
+      "midstream",
+      "downstream",
+      "supply chain",
+      "ecosystem",
+      "上游",
+      "中游",
+      "下游",
+      "产业链",
+      "生态"
+    ],
+    "risk_negative": [
+      "regulation",
+      "delay",
+      "failure",
+      "lawsuit",
+      "cost pressure",
+      "监管",
+      "延期",
+      "失败",
+      "诉讼",
+      "成本压力",
+      "亏损"
+    ]
+  }
+}

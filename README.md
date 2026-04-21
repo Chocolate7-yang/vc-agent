@@ -108,8 +108,8 @@ bash run.sh test724 19:05
 - 数据采集：YouTube 频道 RSS（白名单）
 - 内容处理：去噪、去重、规则评分、分栏归类
 - 摘要与简报：调用 LLM 生成可读性摘要与投资信号
-- 输出与持久化：`output/` Markdown + `data/vc_agent.db`
-- 反馈学习：👍/👎 回写 `preferences.json` 影响后续排序
+- 输出与持久化：简报 Markdown 在 `output/`，采集与运行状态在 `data/vc_agent.db`
+- 反馈学习：飞书卡片或 `python -m vc_agent.feedback` 的每条 👍/👎 会先**追加**到 `data/feedback.jsonl`（事件日志），再**全量重算**并写入 `data/preferences.json`（聚合乘子）；排序阶段只读 `preferences.json`。两份文件的职责与备份注意见 `design.md`「反馈与偏好：落盘与读取」
 - 调度运行：单次执行 + 7x24 常驻调度
 
 ## 数据源状态

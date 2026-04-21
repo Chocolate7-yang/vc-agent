@@ -2,9 +2,7 @@
 
 一个面向投资研究场景的自动化信息流系统：持续采集 AI / 芯片 / 机器人赛道内容，自动过滤并生成每日简报，支持飞书推送与反馈学习。
 
-简报示例：https://applink.feishu.cn/client/message/link/open?token=AmnhOZk%2BAAvHaefKuSHADNw%3D
-
-### 演示视频
+### 简报演示视频
 
 <video src="demo/demo.mov" controls playsinline width="100%"></video>
 

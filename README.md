@@ -8,7 +8,7 @@ https://github.com/user-attachments/assets/77ddbbb1-780f-4892-bfcd-ab66faaa7549
 
 ### 完整简报输出示例
 
-正文见仓库根目录 [`example.md`](example.md)。
+[`example.md`](example.md)。
 
 ### 网络准备（VPN）
 

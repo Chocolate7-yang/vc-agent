@@ -3,5 +3,7 @@
 __pycache__/
 *.pyc
 output/
-data/
+# 运行时 SQLite / 偏好等仍在 data/，不入库；频道白名单与代码一并版本管理
+data/*
+!data/youtube_channels.json
 logs/
